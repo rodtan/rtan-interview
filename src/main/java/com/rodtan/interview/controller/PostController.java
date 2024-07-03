@@ -24,8 +24,8 @@ public class PostController {
     Logger logger = LoggerFactory.getLogger(PostController.class);
 
     @PostMapping("/posts")
-    public Post addPost(@Valid @RequestBody Post Post) {
-        return postService.addPost(Post);
+    public Post addPost(@Valid @RequestBody Post post) {
+        return postService.addPost(post);
     }
 
     @GetMapping("/posts/{id}")
@@ -39,8 +39,8 @@ public class PostController {
     }
 
     @PutMapping("/posts/{id}")
-    public Post updatePost(@Valid @RequestBody Post Post) {
-        return postService.updatePost(Post);
+    public Post updatePost(@Valid @RequestBody Post post) {
+        return postService.updatePost(post);
     }
 
     @DeleteMapping("/posts/{id}")
