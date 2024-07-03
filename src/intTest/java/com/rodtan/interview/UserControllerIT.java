@@ -11,9 +11,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -25,7 +29,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.MOCK,
+        classes = Application.class)
+@AutoConfigureMockMvc
 public class UserControllerIT {
     private MockMvc mvc;
 
@@ -53,7 +60,6 @@ public class UserControllerIT {
     }
     @Test
     public void canGetAllUsers() throws Exception {
-        given(userService.getAllUsers()).willReturn(getAllTestUser());
         MockHttpServletResponse response = mvc.perform(MockMvcRequestBuilders.get("/users")).andReturn().getResponse();
         Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         Assertions.assertThat(response.getContentAsString()).isEqualTo(
@@ -63,7 +69,6 @@ public class UserControllerIT {
 
     @Test
     public void canGetUserById() throws Exception {
-        given(userService.getUser(1)).willReturn(createUser());
         MockHttpServletResponse response = mvc.perform(get("/users/1")).andReturn().getResponse();
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.getContentAsString()).isEqualTo(
@@ -74,7 +79,7 @@ public class UserControllerIT {
     @Test
     public void returnsNotFoundIfUserNotFound() throws Exception {
         MockHttpServletResponse response = mvc
-                .perform(MockMvcRequestBuilders.get("/users/id/1"))
+                .perform(MockMvcRequestBuilders.get("/users/id/10"))
                 .andReturn()
                 .getResponse();
         Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());

@@ -5,32 +5,29 @@ import com.rodtan.interview.model.User;
 import com.rodtan.interview.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(UserController.class)
 public class UserControllerTest {
+    @Autowired
     private MockMvc mvc;
 
-    @Mock
+    @MockBean
     private UserService userService;
-
-    @InjectMocks
-    private UserController userController;
 
     private JacksonTester<User> UserJacksonTester;
 
@@ -39,8 +36,6 @@ public class UserControllerTest {
     @BeforeEach
     public void setUp() {
         JacksonTester.initFields(this, new ObjectMapper());
-        mvc = MockMvcBuilders.standaloneSetup(userController)
-                .build();
     }
 
     private User createUser() {
@@ -48,6 +43,12 @@ public class UserControllerTest {
         user.setId(1);
         return user;
     }
+    private List<User> getAllTestUser() {
+        List<User> users = new ArrayList<>();
+        users.add(createUser());
+        return users;
+    }
+
     @Test
     public void canGetAllUsers() throws Exception {
         given(userService.getAllUsers()).willReturn(getAllTestUser());
@@ -77,10 +78,37 @@ public class UserControllerTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
-    private List<User> getAllTestUser() {
-        List<User> users = new ArrayList<>();
-        users.add(createUser());
-        return users;
+    @Test
+    public void canSaveUser() throws Exception {
+        User inputUser = createUser();
+        given(userService.addUser(inputUser)).willReturn(inputUser);
+        String requestJson = UserJacksonTester.write(inputUser).getJson();
+        MockHttpServletResponse response = mvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(requestJson))
+                .andReturn().getResponse();
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).isEqualTo(
+                UserJacksonTester.write(createUser()).getJson()
+        );
+    }
+
+    @Test
+    public void canUpdateUser() throws Exception {
+        User updatedUser = new User(1, "RodTan", "rodtest@example.com");
+        given(userService.updateUser(updatedUser)).willReturn(updatedUser);
+        String requestJson = UserJacksonTester.write(updatedUser).getJson();
+        MockHttpServletResponse response = mvc.perform(put("/users/1").contentType(MediaType.APPLICATION_JSON).content(requestJson))
+                .andReturn().getResponse();
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        assertThat(response.getContentAsString()).isEqualTo(
+                UserJacksonTester.write(updatedUser).getJson()
+        );
+    }
+
+    @Test
+    public void canDeleteUser() throws Exception {
+        MockHttpServletResponse response = mvc.perform(delete("/users/1"))
+                .andReturn().getResponse();
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
 }
