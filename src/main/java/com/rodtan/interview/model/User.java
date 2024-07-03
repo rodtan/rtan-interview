@@ -1,6 +1,14 @@
 package com.rodtan.interview.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 
 /**
  * Data object that represents a user:
@@ -10,7 +18,11 @@ import jakarta.persistence.*;
  * email - user's email
  *
  */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
+@Valid
 public class User {
     @Id
     @GeneratedValue(generator = "user_gen", strategy = GenerationType.AUTO)
@@ -18,46 +30,14 @@ public class User {
     private Integer id;
 
     @Column(name = "name", length = 20)
+    @NotBlank
+    @NotNull
     private String name;
 
     @Column(length = 30)
     @Email(message = "Email is not valid", regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")
+    @NotBlank
+    @NotNull
     private String email;
 
-    public User() {
-        super();
-    }
-
-    public User(String name, String email) {
-        this.name = name;
-        this.email = email;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String toString() {
-        return "User [id=" + id + ", name=" + name + ", email=" + email + "]";
-    }
 }

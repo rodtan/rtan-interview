@@ -45,7 +45,7 @@ public class UserControllerTest {
     }
 
     public User createUser() {
-        User user = new User("Rod", "rodtest@example.com");
+        User user = new User(1, "Rod", "rodtest@example.com");
         user.setId(1);
         return user;
     }

@@ -2,6 +2,7 @@ package com.rodtan.interview.controller;
 
 import com.rodtan.interview.model.Post;
 import com.rodtan.interview.service.PostService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Controller for {@link com.rodtan.interview.model.Post} CRUD operations
+ */
 @RestController
 public class PostController {
     
@@ -20,7 +24,7 @@ public class PostController {
     Logger logger = LoggerFactory.getLogger(PostController.class);
 
     @PostMapping("/posts")
-    public Post addPost(@RequestBody Post Post) {
+    public Post addPost(@Valid @RequestBody Post Post) {
         return postService.addPost(Post);
     }
 
@@ -35,7 +39,7 @@ public class PostController {
     }
 
     @PutMapping("/posts/{id}")
-    public Post updatePost(@RequestBody Post Post) {
+    public Post updatePost(@Valid @RequestBody Post Post) {
         return postService.updatePost(Post);
     }
 
