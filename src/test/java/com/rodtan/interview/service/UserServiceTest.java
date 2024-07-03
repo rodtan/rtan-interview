@@ -1,17 +1,12 @@
 package com.rodtan.interview.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rodtan.interview.model.User;
 import com.rodtan.interview.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.json.JacksonTester;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +22,9 @@ public class UserServiceTest {
     private UserRepository userRepository;
 
     @InjectMocks
-    UserService userService = new UserServiceImpl();
+    private UserService userService = new UserServiceImpl();
 
-    public User createUser() {
+    private User createUser() {
         User user = new User(1, "Rod", "rodtest@example.com");
         return user;
     }

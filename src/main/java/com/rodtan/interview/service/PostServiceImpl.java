@@ -33,7 +33,6 @@ public class PostServiceImpl implements PostService {
         this.userService = userService;
     }
 
-
     @Override
     public List<Post> getAllPosts() {
         return postRepository.findAll();
@@ -82,6 +81,6 @@ public class PostServiceImpl implements PostService {
         } catch (PostNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        postRepository.delete(oldPost);
+        postRepository.deleteById(oldPost.getId());
     }
 }

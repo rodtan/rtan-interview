@@ -1,8 +1,9 @@
 package com.rodtan.interview.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rodtan.interview.model.Post;
 import com.rodtan.interview.model.User;
-import com.rodtan.interview.service.UserService;
+import com.rodtan.interview.service.PostService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,64 +24,70 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @ExtendWith(MockitoExtension.class)
-public class UserControllerTest {
+public class PostControllerTest {
     private MockMvc mvc;
 
     @Mock
-    private UserService userService;
+    private PostService postService;
 
     @InjectMocks
-    private UserController userController;
+    private PostController postController;
 
-    private JacksonTester<User> UserJacksonTester;
+    private JacksonTester<Post> PostJacksonTester;
 
-    private JacksonTester<List<User>> UserListJacksonTester;
+    private JacksonTester<List<Post>> PostListJacksonTester;
 
     @BeforeEach
     public void setUp() {
         JacksonTester.initFields(this, new ObjectMapper());
-        mvc = MockMvcBuilders.standaloneSetup(userController)
+        mvc = MockMvcBuilders.standaloneSetup(postController)
                 .build();
     }
 
     private User createUser() {
-        User user = new User(1, "Rod", "rodtest@example.com");
-        user.setId(1);
+        User user = new User(1, "Rod", "Tan");
         return user;
     }
+    private Post createPost() {
+        User user = createUser();
+        Post post = new Post(1, "Title", "Content", user, user.getId());
+        return post;
+    }
+    private List<Post> getAllTestPost() {
+        List<Post> posts = new ArrayList<>();
+        posts.add(createPost());
+        return posts;
+    }
+
     @Test
-    public void canGetAllUsers() throws Exception {
-        given(userService.getAllUsers()).willReturn(getAllTestUser());
-        MockHttpServletResponse response = mvc.perform(get("/users")).andReturn().getResponse();
+    public void canGetAllPosts() throws Exception {
+        given(postService.getAllPosts()).willReturn(getAllTestPost());
+        MockHttpServletResponse response = mvc.perform(get("/posts")).andReturn().getResponse();
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.getContentAsString()).isEqualTo(
-                UserListJacksonTester.write(getAllTestUser()).getJson()
+                PostListJacksonTester.write(getAllTestPost()).getJson()
         );
     }
 
     @Test
-    public void canGetUserById() throws Exception {
-        given(userService.getUser(1)).willReturn(createUser());
-        MockHttpServletResponse response = mvc.perform(get("/users/1")).andReturn().getResponse();
+    public void canGetPostById() throws Exception {
+        given(postService.getPostById(1)).willReturn(createPost());
+        MockHttpServletResponse response = mvc.perform(get("/posts/1")).andReturn().getResponse();
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.getContentAsString()).isEqualTo(
-                UserJacksonTester.write(createUser()).getJson()
+                PostJacksonTester.write(createPost()).getJson()
         );
     }
 
     @Test
-    public void returnsNotFoundIfUserNotFound() throws Exception {
+    public void returnsNotFoundIfPostNotFound() throws Exception {
         MockHttpServletResponse response = mvc
-                .perform(get("/users/id/1"))
+                .perform(get("/posts/id/1"))
                 .andReturn()
                 .getResponse();
         assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
-    private List<User> getAllTestUser() {
-        List<User> users = new ArrayList<>();
-        users.add(createUser());
-        return users;
-    }
+
 
 }
