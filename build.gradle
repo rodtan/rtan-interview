@@ -17,22 +17,71 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    intTest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+configurations {
+    intTestImplementation.extendsFrom implementation
+    intTestRuntimeOnly.extendsFrom runtimeOnly
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation:3.3.1'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
 
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
+    compileOnly 'org.projectlombok:lombok:1.18.34'
     runtimeOnly 'com.h2database:h2'
+
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+    testCompileOnly 'org.projectlombok:lombok:1.18.34'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    compileOnly 'org.projectlombok:lombok:1.18.34'
-    annotationProcessor 'org.projectlombok:lombok:1.18.34'
 
-    testCompileOnly 'org.projectlombok:lombok:1.18.34'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+    intTestImplementation 'org.springframework.boot:spring-boot-starter-test'
+    intTestImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
+    intTestRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
-    useJUnitPlatform()
+    useJUnitPlatform() {
+        filter {
+            includeTestsMatching "*Test"
+            excludeTestsMatching "*IT"
+        }
+    }
+
+    testLogging {
+        events "passed"
+    }
 }
+
+def integrationTest = tasks.register('integrationTest', Test) {
+    description = 'Runs integration tests.'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.intTest.output.classesDirs
+    classpath = sourceSets.intTest.runtimeClasspath
+    shouldRunAfter test
+
+    useJUnitPlatform() {
+        filter {
+            includeTestsMatching '*IT'
+            includeTestsMatching 'IT*'
+            includeTestsMatching '*ITCase'
+        }
+    }
+
+    testLogging {
+        events "passed"
+    }
+}
+
+check.dependsOn integrationTest
+

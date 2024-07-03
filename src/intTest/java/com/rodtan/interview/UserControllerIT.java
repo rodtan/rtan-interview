@@ -1,8 +1,10 @@
-package com.rodtan.interview.controller;
+package com.rodtan.interview;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rodtan.interview.controller.UserController;
 import com.rodtan.interview.model.User;
 import com.rodtan.interview.service.UserService;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,6 +15,7 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
@@ -23,7 +26,7 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @ExtendWith(MockitoExtension.class)
-public class UserControllerTest {
+public class UserControllerIT {
     private MockMvc mvc;
 
     @Mock
@@ -51,9 +54,9 @@ public class UserControllerTest {
     @Test
     public void canGetAllUsers() throws Exception {
         given(userService.getAllUsers()).willReturn(getAllTestUser());
-        MockHttpServletResponse response = mvc.perform(get("/users")).andReturn().getResponse();
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.getContentAsString()).isEqualTo(
+        MockHttpServletResponse response = mvc.perform(MockMvcRequestBuilders.get("/users")).andReturn().getResponse();
+        Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        Assertions.assertThat(response.getContentAsString()).isEqualTo(
                 UserListJacksonTester.write(getAllTestUser()).getJson()
         );
     }
@@ -71,10 +74,10 @@ public class UserControllerTest {
     @Test
     public void returnsNotFoundIfUserNotFound() throws Exception {
         MockHttpServletResponse response = mvc
-                .perform(get("/users/id/1"))
+                .perform(MockMvcRequestBuilders.get("/users/id/1"))
                 .andReturn()
                 .getResponse();
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     private List<User> getAllTestUser() {
