@@ -60,6 +60,5 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new UserNotFoundException("user not found");
         }
-
     }
 }

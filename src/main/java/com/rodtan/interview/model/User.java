@@ -21,6 +21,7 @@ public class User {
     private String name;
 
     @Column(length = 30)
+    @Email(message = "Email is not valid", regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")
     private String email;
 
     public User() {

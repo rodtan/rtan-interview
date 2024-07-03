@@ -52,10 +52,7 @@ public class UserControllerTest {
     @Test
     public void canGetAllUsers() throws Exception {
         given(userService.getAllUsers()).willReturn(getAllTestUser());
-
-        MockHttpServletResponse response = mvc.perform(get("/api/users")).andReturn().getResponse();
-
-
+        MockHttpServletResponse response = mvc.perform(get("/users")).andReturn().getResponse();
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.getContentAsString()).isEqualTo(
                 UserListJacksonTester.write(getAllTestUser()).getJson()
@@ -65,10 +62,7 @@ public class UserControllerTest {
     @Test
     public void canGetUserById() throws Exception {
         given(userService.getUser(1)).willReturn(createUser());
-
-        MockHttpServletResponse response = mvc.perform(get("/api/users/1")).andReturn().getResponse();
-
-
+        MockHttpServletResponse response = mvc.perform(get("/users/1")).andReturn().getResponse();
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.getContentAsString()).isEqualTo(
                 UserJacksonTester.write(createUser()).getJson()
@@ -77,14 +71,10 @@ public class UserControllerTest {
 
     @Test
     public void returnsNotFoundIfUserNotFound() throws Exception {
-        given(userService.getUser(1)).willThrow(new UserNotFoundException("invalid id"));
-
         MockHttpServletResponse response = mvc
-                .perform(get("/api/users/id/1"))
+                .perform(get("/users/id/1"))
                 .andReturn()
                 .getResponse();
-
-
         assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
